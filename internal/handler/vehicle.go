@@ -227,3 +227,39 @@ func (h *VehicleDefault) AddBatch() http.HandlerFunc {
 		})
 	}
 }
+
+func (h *VehicleDefault) UpdateFuel() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "invalid id")
+		}
+
+		var reqBody VehicleJSON
+		if err := request.JSON(r, &reqBody); err != nil {
+			response.Error(w, http.StatusBadRequest, "invalid body")
+			return
+		}
+
+		vehicle, err := h.sv.UpdateFuel(id, reqBody.FuelType)
+		if err != nil {
+			switch err.(type) {
+			case *service.FieldValidationError:
+				response.Error(w, http.StatusBadRequest, err.Error())
+			case *repository.VehicleNotFoundError:
+				response.Error(w, http.StatusNotFound, err.Error())
+			default:
+				response.Error(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		data := vehicleToVehicleJSON(vehicle)
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+
+	}
+}

@@ -8,4 +8,5 @@ type VehicleService interface {
 	Add(v Vehicle) (Vehicle, error)
 	AddBatch(v []Vehicle) (map[int]Vehicle, error)
 	UpdateMaxSpeed(id int, maxSpeed float64) (Vehicle, error)
+	UpdateFuel(id int, fuel string) (Vehicle, error)
 }

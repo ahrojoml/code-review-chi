@@ -7,5 +7,6 @@ type VehicleRepository interface {
 	GetById(id int) (Vehicle, error)
 	FindByBrandAndYears(brand string, start, end int) (map[int]Vehicle, error)
 	UpdateMaxSpeed(id int, maxSpeed float64) (Vehicle, error)
+	UpdateFuel(id int, fuel string) (Vehicle, error)
 	Add(v Vehicle) (Vehicle, error)
 }

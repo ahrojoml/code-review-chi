@@ -52,6 +52,14 @@ func (s *VehicleDefault) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehi
 	return s.rp.UpdateMaxSpeed(id, maxSpeed)
 }
 
+func (s *VehicleDefault) UpdateFuel(id int, fuel string) (internal.Vehicle, error) {
+	if fuel == "" {
+		return internal.Vehicle{}, NewFieldValidationError("fuel type")
+	}
+
+	return s.rp.UpdateFuel(id, fuel)
+}
+
 func (s *VehicleDefault) AddBatch(vehicles []internal.Vehicle) (map[int]internal.Vehicle, error) {
 	for _, vehicle := range vehicles {
 		_, err := s.rp.GetById(vehicle.Id)

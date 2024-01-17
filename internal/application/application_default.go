@@ -78,6 +78,7 @@ func (a *ServerChi) Run() (err error) {
 		rt.Post("/batch", hd.AddBatch())
 		// - PUT /vehicles
 		rt.Put("/{id}/update_speed", hd.UpdateMaxSpeed())
+		rt.Put("/{id}/update_fuel", hd.UpdateFuel())
 	})
 
 	// run server
