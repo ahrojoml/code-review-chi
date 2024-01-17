@@ -135,6 +135,11 @@ func (h *VehicleDefault) GetByBrandAndYears() http.HandlerFunc {
 			return
 		}
 
+		if len(vehicles) == 0 {
+			response.Error(w, http.StatusNotFound, "no vehicles found")
+			return
+		}
+
 		data := make(map[int]VehicleJSON)
 		for key, value := range vehicles {
 			data[key] = vehicleToVehicleJSON(value)

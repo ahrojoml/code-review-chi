@@ -61,7 +61,7 @@ func NewVehicleValidationError(field string) error {
 
 func (v Vehicle) IsValid() error {
 	switch {
-	case v.Id == 0:
+	case v.Id <= 0:
 		return NewVehicleValidationError("id")
 	case v.Brand == "":
 		return NewVehicleValidationError("brand")
@@ -71,23 +71,23 @@ func (v Vehicle) IsValid() error {
 		return NewVehicleValidationError("registration")
 	case v.Color == "":
 		return NewVehicleValidationError("color")
-	case v.FabricationYear == 0:
+	case v.FabricationYear <= 0:
 		return NewVehicleValidationError("fabrication_year")
-	case v.Capacity == 0:
+	case v.Capacity <= 0:
 		return NewVehicleValidationError("capacity")
-	case v.MaxSpeed == 0:
+	case v.MaxSpeed <= 0:
 		return NewVehicleValidationError("max_speed")
 	case v.FuelType == "":
 		return NewVehicleValidationError("fuel_type")
 	case v.Transmission == "":
 		return NewVehicleValidationError("transmission")
-	case v.Weight == 0:
+	case v.Weight <= 0:
 		return NewVehicleValidationError("weight")
-	case v.Height == 0:
+	case v.Height <= 0:
 		return NewVehicleValidationError("height")
-	case v.Length == 0:
+	case v.Length <= 0:
 		return NewVehicleValidationError("length")
-	case v.Width == 0:
+	case v.Width <= 0:
 		return NewVehicleValidationError("width")
 	}
 
