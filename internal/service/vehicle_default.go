@@ -1,6 +1,9 @@
 package service
 
-import "app/internal"
+import (
+	"app/internal"
+	"app/internal/repository"
+)
 
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
 func NewVehicleDefault(rp internal.VehicleRepository) *VehicleDefault {
@@ -50,4 +53,29 @@ func (s *VehicleDefault) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehi
 	}
 
 	return s.rp.UpdateMaxSpeed(id, maxSpeed)
+}
+
+func (s *VehicleDefault) AddBatch(vehicles []internal.Vehicle) (map[int]internal.Vehicle, error) {
+	for _, vehicle := range vehicles {
+		_, err := s.rp.GetById(vehicle.Id)
+		if err == nil {
+			return map[int]internal.Vehicle{}, repository.NewVehicleAlreadyExistsError(vehicle.Id)
+		}
+
+		if err := vehicle.IsValid(); err != nil {
+			return map[int]internal.Vehicle{}, err
+		}
+	}
+
+	newVehicles := make(map[int]internal.Vehicle)
+	for _, vehicle := range vehicles {
+		addedVehicle, err := s.rp.Add(vehicle)
+		if err != nil {
+			return map[int]internal.Vehicle{}, err
+		}
+		newVehicles[addedVehicle.Id] = addedVehicle
+	}
+
+	return newVehicles, nil
+
 }

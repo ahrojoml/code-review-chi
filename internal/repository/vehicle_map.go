@@ -52,3 +52,12 @@ func (r *VehicleMap) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehicle,
 
 	return vehicle, nil
 }
+
+func (r *VehicleMap) GetById(id int) (internal.Vehicle, error) {
+	vehicle, ok := r.db[id]
+	if !ok {
+		return internal.Vehicle{}, NewVehicleNotFoundError(id)
+	}
+
+	return vehicle, nil
+}

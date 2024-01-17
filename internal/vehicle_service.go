@@ -6,5 +6,6 @@ type VehicleService interface {
 	FindAll() (v map[int]Vehicle, err error)
 	FindByBrandAndYears(brand string, start, end int) (map[int]Vehicle, error)
 	Add(v Vehicle) (Vehicle, error)
+	AddBatch(v []Vehicle) (map[int]Vehicle, error)
 	UpdateMaxSpeed(id int, maxSpeed float64) (Vehicle, error)
 }

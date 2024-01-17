@@ -30,6 +30,10 @@ type VehicleJSON struct {
 	Width           float64 `json:"width"`
 }
 
+type VehicleJSONBatch struct {
+	Vehicles []VehicleJSON `json:"vehicles"`
+}
+
 // NewVehicleDefault is a function that returns a new instance of VehicleDefault
 func NewVehicleDefault(sv internal.VehicleService) *VehicleDefault {
 	return &VehicleDefault{sv: sv}
@@ -169,6 +173,44 @@ func (h *VehicleDefault) UpdateMaxSpeed() http.HandlerFunc {
 		data := vehicleToVehicleJSON(vehicle)
 
 		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+	}
+}
+
+func (h *VehicleDefault) AddBatch() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var reqBody VehicleJSONBatch
+		if err := request.JSON(r, &reqBody); err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+
+		vehicleBatch := []internal.Vehicle{}
+		for _, vehicle := range reqBody.Vehicles {
+			vehicleBatch = append(vehicleBatch, vehicleJSONToVehicle(vehicle))
+		}
+
+		vehicles, err := h.sv.AddBatch(vehicleBatch)
+		if err != nil {
+			switch err.(type) {
+			case *internal.VehicleValidationError:
+				response.Error(w, http.StatusBadRequest, err.Error())
+			case *repository.VehicleAlreadyExistsError:
+				response.Error(w, http.StatusConflict, err.Error())
+			default:
+				response.Error(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		data := make(map[int]VehicleJSON)
+		for key, value := range vehicles {
+			data[key] = vehicleToVehicleJSON(value)
+		}
+
+		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "success",
 			"data":    data,
 		})

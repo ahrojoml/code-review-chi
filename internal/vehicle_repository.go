@@ -4,6 +4,7 @@ package internal
 type VehicleRepository interface {
 	// FindAll is a method that returns a map of all vehicles
 	FindAll() (v map[int]Vehicle, err error)
+	GetById(id int) (Vehicle, error)
 	UpdateMaxSpeed(id int, maxSpeed float64) (Vehicle, error)
 	Add(v Vehicle) (Vehicle, error)
 }
