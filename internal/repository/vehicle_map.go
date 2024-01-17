@@ -61,3 +61,17 @@ func (r *VehicleMap) GetById(id int) (internal.Vehicle, error) {
 
 	return vehicle, nil
 }
+
+func (r *VehicleMap) FindByBrandAndYears(brand string, start, end int) (map[int]internal.Vehicle, error) {
+	vehicles := make(map[int]internal.Vehicle)
+
+	for key, value := range r.db {
+		if value.Brand == brand &&
+			value.FabricationYear >= start &&
+			value.FabricationYear <= end {
+			vehicles[key] = value
+		}
+	}
+
+	return vehicles, nil
+}

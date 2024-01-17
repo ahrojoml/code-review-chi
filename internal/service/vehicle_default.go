@@ -30,21 +30,18 @@ func (s *VehicleDefault) Add(vehicle internal.Vehicle) (internal.Vehicle, error)
 }
 
 func (s *VehicleDefault) FindByBrandAndYears(brand string, start, end int) (map[int]internal.Vehicle, error) {
-	allVehicles, err := s.rp.FindAll()
-	if err != nil {
-		return map[int]internal.Vehicle{}, err
+	if brand == "" {
+		return map[int]internal.Vehicle{}, NewFieldValidationError("brand must not be empty")
 	}
 
-	vehicles := make(map[int]internal.Vehicle)
-	for key, value := range allVehicles {
-		if value.Brand == brand &&
-			value.FabricationYear >= start &&
-			value.FabricationYear <= end {
-			vehicles[key] = value
-		}
+	if start <= 0 {
+		return map[int]internal.Vehicle{}, NewFieldValidationError("start year must be greater than zero")
 	}
 
-	return vehicles, nil
+	if end <= 0 {
+		return map[int]internal.Vehicle{}, NewFieldValidationError("end year must be greater than zero")
+	}
+	return s.rp.FindByBrandAndYears(brand, start, end)
 }
 
 func (s *VehicleDefault) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehicle, error) {

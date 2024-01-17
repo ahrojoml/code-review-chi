@@ -125,7 +125,13 @@ func (h *VehicleDefault) GetByBrandAndYears() http.HandlerFunc {
 
 		vehicles, err := h.sv.FindByBrandAndYears(brand, startYear, endYear)
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, "internal server error")
+			switch err.(type) {
+			case *service.FieldValidationError:
+				response.Error(w, http.StatusBadRequest, err.Error())
+			default:
+				response.Error(w, http.StatusInternalServerError, "internal server error")
+			}
+
 			return
 		}
 
