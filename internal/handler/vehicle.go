@@ -3,6 +3,7 @@ package handler
 import (
 	"app/internal"
 	"app/internal/repository"
+	"app/internal/service"
 	"net/http"
 	"strconv"
 
@@ -91,7 +92,7 @@ func (h *VehicleDefault) Add() http.HandlerFunc {
 
 		data := vehicleToVehicleJSON(vehicle)
 
-		response.JSON(w, http.StatusOK, map[string]any{
+		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "success",
 			"data":    data,
 		})
@@ -128,6 +129,44 @@ func (h *VehicleDefault) GetByBrandAndYears() http.HandlerFunc {
 		for key, value := range vehicles {
 			data[key] = vehicleToVehicleJSON(value)
 		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+	}
+}
+
+func (h *VehicleDefault) UpdateMaxSpeed() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "invalid id")
+			return
+		}
+
+		var reqBody VehicleJSON
+		if err := request.JSON(r, &reqBody); err != nil {
+			response.JSON(w, http.StatusBadRequest, nil)
+			return
+		}
+
+		maxSpeed := reqBody.MaxSpeed
+
+		vehicle, err := h.sv.UpdateMaxSpeed(id, maxSpeed)
+		if err != nil {
+			switch err.(type) {
+			case *repository.VehicleNotFoundError:
+				response.Error(w, http.StatusNotFound, err.Error())
+			case *service.FieldValidationError:
+				response.Error(w, http.StatusBadRequest, err.Error())
+			default:
+				response.Error(w, http.StatusInternalServerError, "internal server error")
+			}
+			return
+		}
+
+		data := vehicleToVehicleJSON(vehicle)
 
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",

@@ -25,3 +25,15 @@ func (e *QueryError) Error() string {
 func NewQueryError(msg string) error {
 	return &QueryError{msg: msg}
 }
+
+type VehicleNotFoundError struct {
+	id int
+}
+
+func (e *VehicleNotFoundError) Error() string {
+	return fmt.Sprintf("vehicle with id %d not found", e.id)
+}
+
+func NewVehicleNotFoundError(id int) error {
+	return &VehicleNotFoundError{id: id}
+}

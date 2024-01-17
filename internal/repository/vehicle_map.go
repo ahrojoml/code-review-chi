@@ -40,3 +40,15 @@ func (r *VehicleMap) Add(v internal.Vehicle) (internal.Vehicle, error) {
 	r.db[v.Id] = v
 	return v, nil
 }
+
+func (r *VehicleMap) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehicle, error) {
+	vehicle, ok := r.db[id]
+	if !ok {
+		return internal.Vehicle{}, NewVehicleNotFoundError(id)
+	}
+
+	vehicle.MaxSpeed = maxSpeed
+	r.db[id] = vehicle
+
+	return vehicle, nil
+}

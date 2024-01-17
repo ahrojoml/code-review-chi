@@ -43,3 +43,11 @@ func (s *VehicleDefault) FindByBrandAndYears(brand string, start, end int) (map[
 
 	return vehicles, nil
 }
+
+func (s *VehicleDefault) UpdateMaxSpeed(id int, maxSpeed float64) (internal.Vehicle, error) {
+	if maxSpeed <= 0 {
+		return internal.Vehicle{}, NewFieldValidationError("max speed must be greater than zero")
+	}
+
+	return s.rp.UpdateMaxSpeed(id, maxSpeed)
+}
