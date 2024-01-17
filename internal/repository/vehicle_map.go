@@ -2,20 +2,7 @@ package repository
 
 import (
 	"app/internal"
-	"fmt"
 )
-
-type VehicleAlreadyExistsError struct {
-	id int
-}
-
-func (e *VehicleAlreadyExistsError) Error() string {
-	return fmt.Sprintf("vehicle with id %d already exists", e.id)
-}
-
-func NewVehicleAlreadyExistsError(id int) error {
-	return &VehicleAlreadyExistsError{id: id}
-}
 
 // NewVehicleMap is a function that returns a new instance of VehicleMap
 func NewVehicleMap(db map[int]internal.Vehicle) *VehicleMap {

@@ -4,9 +4,11 @@ import (
 	"app/internal"
 	"app/internal/repository"
 	"net/http"
+	"strconv"
 
 	"github.com/bootcamp-go/web/request"
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 )
 
 // VehicleJSON is a struct that represents a vehicle in JSON format
@@ -55,22 +57,7 @@ func (h *VehicleDefault) GetAll() http.HandlerFunc {
 		// response
 		data := make(map[int]VehicleJSON)
 		for key, value := range v {
-			data[key] = VehicleJSON{
-				ID:              value.Id,
-				Brand:           value.Brand,
-				Model:           value.Model,
-				Registration:    value.Registration,
-				Color:           value.Color,
-				FabricationYear: value.FabricationYear,
-				Capacity:        value.Capacity,
-				MaxSpeed:        value.MaxSpeed,
-				FuelType:        value.FuelType,
-				Transmission:    value.Transmission,
-				Weight:          value.Weight,
-				Height:          value.Height,
-				Length:          value.Length,
-				Width:           value.Width,
-			}
+			data[key] = vehicleToVehicleJSON(value)
 		}
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
@@ -81,7 +68,6 @@ func (h *VehicleDefault) GetAll() http.HandlerFunc {
 
 func (h *VehicleDefault) Add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// request
 		var reqBody VehicleJSON
 		if err := request.JSON(r, &reqBody); err != nil {
 			response.JSON(w, http.StatusBadRequest, nil)
@@ -105,8 +91,43 @@ func (h *VehicleDefault) Add() http.HandlerFunc {
 
 		data := vehicleToVehicleJSON(vehicle)
 
-		// process
-		// - get all vehicles
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    data,
+		})
+	}
+}
+
+func (h *VehicleDefault) GetByBrandAndYears() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		brand := chi.URLParam(r, "brand")
+		if brand == "" {
+			response.Error(w, http.StatusBadRequest, "brand field empty")
+			return
+		}
+
+		startYear, err := strconv.Atoi(chi.URLParam(r, "start_year"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "invalid starting year")
+			return
+		}
+
+		endYear, err := strconv.Atoi(chi.URLParam(r, "end_year"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "invalid ending year")
+			return
+		}
+
+		vehicles, err := h.sv.FindByBrandAndYears(brand, startYear, endYear)
+		if err != nil {
+			response.Error(w, http.StatusInternalServerError, "internal server error")
+			return
+		}
+
+		data := make(map[int]VehicleJSON)
+		for key, value := range vehicles {
+			data[key] = vehicleToVehicleJSON(value)
+		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "success",
